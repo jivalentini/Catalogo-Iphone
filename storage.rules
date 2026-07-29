@@ -1,27 +1,14 @@
-rules_version = '2';
-
 // ===================================================================
-// Reglas de seguridad de Storage
-// - Lectura pública de imágenes de productos y configuración (para el catálogo).
-// - Escritura (subida/eliminación) solo para empleados y administradores logueados.
+// ESTE ARCHIVO YA NO SE USA.
+// -------------------------------------------------------------------
+// El proyecto dejó de usar Firebase Storage porque, desde febrero de
+// 2026, Google exige tener activado el plan de pago Blaze (con tarjeta
+// cargada) para poder usarlo, incluso si el consumo real es gratuito.
+//
+// Las imágenes de productos, logo y banner ahora se suben a Cloudinary
+// (nivel gratuito, sin tarjeta) — ver js/utils/cloudinary.js y la
+// sección "Configuración de Cloudinary" del README.
+//
+// No hace falta activar Cloud Storage ni publicar estas reglas en
+// Firebase Console. Este archivo se deja solo como referencia.
 // ===================================================================
-service firebase.storage {
-  match /b/{bucket}/o {
-
-    // Como las cuentas de usuario solo las crea un administrador (no hay
-    // alta pública), cualquier usuario autenticado es empleado o administrador.
-    function estaLogueado() {
-      return request.auth != null;
-    }
-
-    match /products/{productoId}/{archivo} {
-      allow read: true;
-      allow write: if estaLogueado();
-    }
-
-    match /config/{archivo} {
-      allow read: true;
-      allow write: if estaLogueado();
-    }
-  }
-}

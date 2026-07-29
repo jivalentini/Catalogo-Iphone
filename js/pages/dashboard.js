@@ -2,7 +2,7 @@
 // Panel de administración: resumen, productos, empleados y
 // configuración visual del negocio.
 // ===================================================================
-import { app, auth, db, storage } from "../firebase-config.js";
+import { app, auth, db } from "../firebase-config.js";
 import { requerirSesion, esAdministrador, cerrarSesion } from "../utils/auth-guard.js";
 import {
   collection, onSnapshot, doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp,
@@ -13,7 +13,7 @@ import {
 import {
   getAuth, createUserWithEmailAndPassword, signOut,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { subirImagenCloudinary } from "../utils/cloudinary.js";
 import { formatearPrecio } from "../utils/formato.js";
 import { tituloProducto, fotoPrincipal } from "../components/product-card.js";
 import { abrirFormularioProducto, inicializarFormularioProducto, eliminarProducto } from "./product-form.js";
@@ -220,9 +220,7 @@ function inicializarConfigNegocio() {
 }
 
 async function subirArchivoConfig(archivo, nombre) {
-  const storageRef = ref(storage, `config/${nombre}-${Date.now()}`);
-  await uploadBytes(storageRef, archivo);
-  return getDownloadURL(storageRef);
+  return subirImagenCloudinary(archivo, `config/${nombre}`);
 }
 
 // ---------------- Inicio ----------------

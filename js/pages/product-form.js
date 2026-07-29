@@ -2,9 +2,9 @@
 // Alta / edición de productos (iPhone y accesorios), incluyendo
 // subida de imágenes a Storage y reordenamiento por drag & drop.
 // ===================================================================
-import { db, storage } from "../firebase-config.js";
+import { db } from "../firebase-config.js";
 import { doc, setDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { subirImagenCloudinary } from "../utils/cloudinary.js";
 import { generarCodigo } from "../utils/formato.js";
 import { CATEGORIAS, ETIQUETAS_DISPONIBLES } from "../data/categorias.js";
 import { crearSelectorEstrellas } from "../components/stars-input.js";
@@ -69,14 +69,17 @@ function pintarMiniaturas() {
 
 async function subirFotos(e) {
   const archivos = Array.from(e.target.files).slice(0, 10 - fotosActuales.length);
-  for (const archivo of archivos) {
-    const path = `products/${carpetaStorage}/${Date.now()}-${archivo.name}`;
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, archivo);
-    const url = await getDownloadURL(storageRef);
-    fotosActuales.push(url);
+  const boton = e.target;
+  boton.disabled = true;
+  try {
+    for (const archivo of archivos) {
+      const url = await subirImagenCloudinary(archivo, `productos/${carpetaStorage}`);
+      fotosActuales.push(url);
+      pintarMiniaturas();
+    }
+  } catch (err) {
+    alert(err.message);
   }
-  pintarMiniaturas();
 }
 
 function actualizarVisibilidadCampos() {
@@ -214,10 +217,7 @@ async function guardarProducto() {
 
 export async function eliminarProducto(producto) {
   if (!confirm(`¿Eliminar el producto ${producto.codigo}? Esta acción no se puede deshacer.`)) return;
-  await Promise.all((producto.fotos || []).map((url) => {
-    try {
-      return deleteObject(ref(storage, url));
-    } catch { return Promise.resolve(); }
-  }));
+  // Las imágenes quedan en Cloudinary (no se pueden borrar de forma
+  // segura sin backend); solo se elimina el registro del producto.
   await deleteDoc(doc(db, "products", producto.id));
 }

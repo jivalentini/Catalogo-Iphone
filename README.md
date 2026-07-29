@@ -3,20 +3,31 @@
 Producto comercial de catálogo online para tiendas de venta de iPhone y
 accesorios. Cada cliente despliega su propia instalación independiente
 (no es multi-tenant), sin backend propio: HTML + CSS + JavaScript puro
-conectado a Firebase (Authentication, Firestore y Storage), hosteado en
-GitHub Pages.
+conectado a Firebase (Authentication y Firestore, ambos gratis sin
+tarjeta) y Cloudinary (almacenamiento de imágenes, también gratis),
+hosteado en GitHub Pages.
+
+> **Por qué Cloudinary y no Firebase Storage:** desde febrero de 2026,
+> Firebase exige tener el plan de pago Blaze activado (con tarjeta
+> cargada) para usar Cloud Storage, aunque el consumo real sea gratuito.
+> Como este catálogo se vende a múltiples negocios, cada uno con su
+> propio proyecto de Firebase, eso significaría pedirle tarjeta a cada
+> cliente. Cloudinary resuelve solo el almacenamiento de imágenes con un
+> nivel gratuito permanente (25GB) y sin tarjeta, dejando Auth y
+> Firestore en Firebase (que siguen sin costo).
 
 ## Índice
 
 1. Instalación
 2. Configuración de Firebase
-3. Publicar en GitHub Pages
-4. Crear el administrador
-5. Crear empleados
-6. Personalizar el negocio
-7. Estructura del proyecto
-8. Modelo de datos en Firestore
-9. Seguridad de `seed.html`
+3. Configuración de Cloudinary (imágenes)
+4. Publicar en GitHub Pages
+5. Crear el administrador
+6. Crear empleados
+7. Personalizar el negocio
+8. Estructura del proyecto
+9. Modelo de datos en Firestore
+10. Seguridad de `seed.html`
 
 ---
 
@@ -44,15 +55,41 @@ No requiere `npm install` ni build: es HTML/CSS/JS puro. Alcanza con:
    - **Authentication** → pestaña "Sign-in method" → habilitar
      "Correo electrónico/contraseña".
    - **Firestore Database** → crear base de datos (modo producción).
-   - **Storage** → activar el bucket.
-5. Subí las reglas de seguridad incluidas en este proyecto:
-   - `firestore.rules` → Firestore Database → Reglas → pegar el
-     contenido → Publicar.
-   - `storage.rules` → Storage → Reglas → pegar el contenido → Publicar.
+   - No hace falta activar **Storage**: las imágenes se manejan con
+     Cloudinary (paso siguiente).
+5. Subí las reglas de seguridad de Firestore incluidas en este proyecto:
+   `firestore.rules` → Firestore Database → Reglas → pegar el
+   contenido → Publicar.
 
-   (Si usás Firebase CLI: `firebase deploy --only firestore:rules,storage`.)
+   (Si usás Firebase CLI: `firebase deploy --only firestore:rules`.)
 
-## 3. Publicar en GitHub Pages
+## 3. Configuración de Cloudinary (imágenes)
+
+Las fotos de productos, el logo y el banner del negocio se suben a
+[Cloudinary](https://cloudinary.com), que tiene un nivel gratuito
+permanente (25GB de almacenamiento y 25GB de transferencia por mes) sin
+pedir tarjeta.
+
+1. Creá una cuenta gratuita en [cloudinary.com](https://cloudinary.com).
+2. En el Dashboard, copiá tu **Cloud Name** (aparece arriba de todo).
+3. Andá a **Settings → Upload → Upload presets → Add upload preset**:
+   - **Signing Mode**: elegí **Unsigned** (necesario porque este
+     proyecto no tiene backend que firme las subidas).
+   - Ponele un nombre corto (por ejemplo `catalogo-iphone`) y guardá.
+4. Pegá esos dos datos en `js/utils/cloudinary.js`, reemplazando los
+   placeholders:
+   ```js
+   export const CLOUDINARY_CLOUD_NAME = "tu-cloud-name";
+   export const CLOUDINARY_UPLOAD_PRESET = "catalogo-iphone";
+   ```
+
+Con un preset **Unsigned**, cualquiera que conozca esos dos valores
+podría subir imágenes a tu cuenta (no borrar ni leer datos privados,
+solo subir). Para un catálogo comercial esto es un riesgo bajo y
+aceptado — si te preocupa, podés limitar el preset a ciertos formatos o
+tamaños máximos desde la configuración del preset en Cloudinary.
+
+## 4. Publicar en GitHub Pages
 
 1. Creá un repositorio nuevo en GitHub y subí todo el contenido de esta
    carpeta a la rama `main`.
@@ -63,7 +100,7 @@ No requiere `npm install` ni build: es HTML/CSS/JS puro. Alcanza con:
 4. En Firebase → Authentication → Settings → "Authorized domains",
    agregá ese dominio de GitHub Pages (si no, el login falla).
 
-## 4. Crear el administrador
+## 5. Crear el administrador
 
 Al ser un producto sin backend propio, la primera cuenta se crea desde
 una página de configuración incluida: `seed.html`.
@@ -78,7 +115,7 @@ una página de configuración incluida: `seed.html`.
 4. Iniciá sesión en `login.html` con esa cuenta y entrá a
    `dashboard.html`.
 
-## 5. Crear empleados
+## 6. Crear empleados
 
 Desde `dashboard.html` → sección **Empleados** (solo visible para el
 administrador): completá nombre, email y contraseña, y el sistema crea
@@ -90,14 +127,14 @@ Para dar de baja a un empleado no hace falta borrarlo: en la tabla de
 empleados hay un botón "Desactivar" que le bloquea el acceso sin perder
 el historial.
 
-## 6. Personalizar el negocio
+## 7. Personalizar el negocio
 
 Desde `dashboard.html` → sección **Configuración** (solo administrador)
 se edita, sin tocar código: nombre del negocio, logo, banner, colores
 primario/secundario, número de WhatsApp, Instagram, Facebook, dirección
 y horarios. Los cambios se reflejan al instante en el catálogo público.
 
-## 7. Estructura del proyecto
+## 8. Estructura del proyecto
 
 ```
 index.html              Catálogo público (buscador, filtros, grilla)
@@ -106,20 +143,20 @@ login.html              Login de empleados/administradores
 dashboard.html          Panel: resumen, productos, empleados, config
 seed.html               Configuración inicial (crear admin + datos demo)
 css/styles.css          Estilos globales
-js/firebase-config.js   Credenciales del proyecto Firebase
+js/firebase-config.js   Credenciales del proyecto Firebase (Auth + Firestore)
 js/data/                Categorías y datos de ejemplo (seed)
-js/utils/                Formato, WhatsApp, protección de rutas
+js/utils/                Formato, WhatsApp, protección de rutas, subida a Cloudinary
 js/components/           Tarjeta de producto, galería, selector de estrellas
 js/pages/                Lógica de cada página
 firestore.rules          Reglas de seguridad de Firestore
-storage.rules            Reglas de seguridad de Storage
+storage.rules            Sin uso (se dejó documentado por qué se dejó de usar Firebase Storage)
 ```
 
 Arquitectura modular con componentes reutilizables (ES modules),
 responsive y con una estética inspirada en Apple (tipografía del
 sistema, blancos y grises, tarjetas redondeadas, acentos en azul).
 
-## 8. Modelo de datos en Firestore
+## 9. Modelo de datos en Firestore
 
 - **config**
   - `negocio`: nombre, logoUrl, bannerUrl, colorPrimario, colorSecundario, whatsapp, instagram, facebook, direccion, horarios.
@@ -134,7 +171,7 @@ sistema, blancos y grises, tarjetas redondeadas, acentos en azul).
   AirPods, Cargadores, Cables, Fundas, Protectores, Accesorios).
 - **stats**: `global` con `visitasCatalogo` y `consultasWhatsapp`.
 
-## 9. Seguridad de `seed.html`
+## 10. Seguridad de `seed.html`
 
 Esta página permite crear cuentas de administrador y cargar datos de
 ejemplo, por eso **no debe quedar accesible una vez configurado el
