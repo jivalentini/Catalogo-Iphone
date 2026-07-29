@@ -14,12 +14,12 @@ import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebas
 // pago Blaze). Las imágenes se suben a Cloudinary — ver js/utils/cloudinary.js.
 
 export const firebaseConfig = {
-  apiKey: "TU_API_KEY",
-  authDomain: "catalogo-iphone-5886c.firebaseapp.com",
-  projectId: "catalogo-iphone-5886c",
-  storageBucket: "catalogo-iphone-5886c.appspot.com",
-  messagingSenderId: "338455641366",
-  appId: "catalogo-iphone-5886c",
+apiKey: "AIzaSyC22rTHh1zGQXVd7cDKeJOKn_2X7hfbNpU",
+authDomain: "catalogo-iphone-5886c.firebaseapp.com",
+projectId: "catalogo-iphone-5886c",
+storageBucket: "catalogo-iphone-5886c.firebasestorage.app",
+messagingSenderId: "338455641366",
+appId: "1:338455641366:web:e824dacb119fcbfb282437",
 };
 
 export const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
