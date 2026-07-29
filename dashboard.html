@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel · Catálogo de iPhone</title>
+<link rel="stylesheet" href="css/styles.css">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+
+<div class="dashboard">
+  <aside class="dashboard__lateral">
+    <div class="marca">Panel del negocio</div>
+    <nav>
+      <a href="#" data-seccion="resumen" class="activa">📊 Resumen</a>
+      <a href="#" data-seccion="productos">📦 Productos</a>
+      <a href="#" data-seccion="empleados" class="solo-admin">👥 Empleados</a>
+      <a href="#" data-seccion="configuracion" class="solo-admin">🎨 Configuración</a>
+    </nav>
+  </aside>
+
+  <main class="dashboard__contenido">
+    <div class="dashboard__cabecera">
+      <h1>Hola, <span id="nombreUsuarioDash"></span></h1>
+      <div style="text-align:right">
+        <div style="font-size:12px;color:var(--color-texto-suave);text-transform:capitalize" id="rolUsuarioDash"></div>
+        <button id="btnCerrarSesion" class="btn-secundario btn-chico">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <!-- ---------- RESUMEN ---------- -->
+    <section id="seccion-resumen" class="seccion-dash">
+      <div class="tarjetas-stats">
+        <div class="stat-card"><div class="stat-card__valor" id="statPublicados">0</div><div class="stat-card__label">Productos publicados</div></div>
+        <div class="stat-card"><div class="stat-card__valor" id="statVendidos">0</div><div class="stat-card__label">Vendidos</div></div>
+        <div class="stat-card"><div class="stat-card__valor" id="statVisitas">0</div><div class="stat-card__label">Visitas al catálogo</div></div>
+        <div class="stat-card"><div class="stat-card__valor" id="statConsultas">0</div><div class="stat-card__label">Consultas WhatsApp</div></div>
+        <div class="stat-card"><div class="stat-card__valor" id="statDestacados">0</div><div class="stat-card__label">Destacados</div></div>
+        <div class="stat-card"><div class="stat-card__valor" id="statPocoStock">0</div><div class="stat-card__label">Poco stock lógico</div></div>
+      </div>
+    </section>
+
+    <!-- ---------- PRODUCTOS ---------- -->
+    <section id="seccion-productos" class="seccion-dash oculto">
+      <div class="panel">
+        <div class="panel__cabecera">
+          <input id="buscarProductoDash" type="text" placeholder="Buscar producto..." style="padding:10px;border-radius:10px;border:1px solid var(--color-borde);min-width:240px">
+          <button id="btnNuevoProducto" class="btn-primario">+ Nuevo producto</button>
+        </div>
+        <table class="tabla">
+          <thead><tr><th></th><th>Código</th><th>Producto</th><th>Categoría</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="cuerpoTablaProductos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- EMPLEADOS ---------- -->
+    <section id="seccion-empleados" class="seccion-dash oculto solo-admin">
+      <div class="panel">
+        <div class="panel__cabecera"><h2 style="font-size:16px">Nuevo empleado</h2></div>
+        <form id="formNuevoEmpleado" class="form-grid">
+          <div class="campo"><label>Nombre</label><input id="empNombre" required></div>
+          <div class="campo"><label>Email</label><input id="empEmail" type="email" required></div>
+          <div class="campo"><label>Contraseña</label><input id="empPassword" type="password" minlength="6" required></div>
+          <div class="campo full"><button type="submit" class="btn-primario">Crear empleado</button></div>
+          <p id="msgEmpleado" class="full" style="font-size:13px"></p>
+        </form>
+      </div>
+      <div class="panel">
+        <div class="panel__cabecera"><h2 style="font-size:16px">Empleados</h2></div>
+        <table class="tabla">
+          <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="cuerpoTablaEmpleados"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- CONFIGURACIÓN ---------- -->
+    <section id="seccion-configuracion" class="seccion-dash oculto solo-admin">
+      <div class="panel">
+        <div class="panel__cabecera"><h2 style="font-size:16px">Configuración visual del negocio</h2></div>
+        <form id="formConfigNegocio" class="form-grid">
+          <div class="campo"><label>Nombre del negocio</label><input id="cfgNombre"></div>
+          <div class="campo"><label>WhatsApp (con código de país)</label><input id="cfgWhatsapp" placeholder="5491100000000"></div>
+          <div class="campo"><label>Instagram (URL)</label><input id="cfgInstagram"></div>
+          <div class="campo"><label>Facebook (URL)</label><input id="cfgFacebook"></div>
+          <div class="campo"><label>Dirección</label><input id="cfgDireccion"></div>
+          <div class="campo"><label>Horarios</label><input id="cfgHorarios"></div>
+          <div class="campo"><label>Color primario</label><input id="cfgColorPrimario" type="color"></div>
+          <div class="campo"><label>Color secundario</label><input id="cfgColorSecundario" type="color"></div>
+          <div class="campo">
+            <label>Logo</label>
+            <img id="previewLogo" style="width:60px;height:60px;border-radius:10px;object-fit:cover;margin-bottom:8px" src="https://placehold.co/60x60/f5f5f7/6e6e73?text=Logo">
+            <input id="cfgLogoInput" type="file" accept="image/*">
+          </div>
+          <div class="campo">
+            <label>Banner</label>
+            <img id="previewBanner" style="width:100%;max-width:200px;height:60px;border-radius:10px;object-fit:cover;margin-bottom:8px" src="https://placehold.co/200x60/f5f5f7/6e6e73?text=Banner">
+            <input id="cfgBannerInput" type="file" accept="image/*">
+          </div>
+          <div class="campo full"><button type="submit" class="btn-primario">Guardar configuración</button></div>
+          <p id="msgConfigNegocio" class="full" style="font-size:13px"></p>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ---------- MODAL: Alta / edición de producto ---------- -->
+<div id="modalProducto" class="modal-fondo">
+  <div class="modal">
+    <div class="modal__cabecera">
+      <h2 id="tituloModalProducto">Nuevo producto</h2>
+      <button type="button" id="btnCerrarModalProducto" class="modal__cerrar">&times;</button>
+    </div>
+    <form id="formProducto" class="form-grid">
+      <div class="campo"><label>Tipo</label>
+        <select id="campoTipo"><option value="iphone">iPhone</option><option value="accesorio">Accesorio</option></select>
+      </div>
+      <div class="campo" id="grupoCategoria"><label>Categoría</label><select id="campoCategoria"></select></div>
+
+      <!-- Campos iPhone -->
+      <div class="campo solo-iphone"><label>Modelo</label><input id="campoModelo" placeholder="Ej: 15 Pro Max"></div>
+      <div class="campo solo-iphone"><label>Capacidad</label><input id="campoCapacidad" placeholder="Ej: 256GB"></div>
+      <div class="campo solo-iphone"><label>Color</label><input id="campoColor"></div>
+      <div class="campo solo-iphone"><label>Estado</label>
+        <select id="campoEstado"><option value="nuevo">Nuevo</option><option value="usado">Usado</option></select>
+      </div>
+      <div class="campo solo-iphone full"><label>Estado estético</label><div id="campoEstadoEstetico"></div></div>
+      <div class="campo solo-iphone"><label>% Batería</label><input id="campoBateria" type="number" min="0" max="100"></div>
+      <div class="campo solo-iphone full">
+        <div class="checks-grid">
+          <label class="check-item"><input type="checkbox" id="campoFaceId"> Face ID</label>
+          <label class="check-item"><input type="checkbox" id="campoTrueTone"> True Tone</label>
+          <label class="check-item"><input type="checkbox" id="campoOriginales"> Partes originales</label>
+          <label class="check-item"><input type="checkbox" id="campoCaja"> Caja</label>
+          <label class="check-item"><input type="checkbox" id="campoCable"> Cable</label>
+          <label class="check-item"><input type="checkbox" id="campoCargador"> Cargador</label>
+          <label class="check-item"><input type="checkbox" id="campoAuriculares"> Auriculares</label>
+        </div>
+      </div>
+
+      <!-- Campos accesorio -->
+      <div class="campo solo-accesorio"><label>Nombre</label><input id="campoNombre"></div>
+      <div class="campo solo-accesorio"><label>Marca</label><input id="campoMarca"></div>
+      <div class="campo solo-accesorio"><label>Compatibilidad</label><input id="campoCompatibilidad"></div>
+      <div class="campo solo-accesorio full"><label>Descripción</label><textarea id="campoDescripcionAcc"></textarea></div>
+      <div class="campo solo-accesorio"><label>Stock lógico</label>
+        <select id="campoStockLogico"><option value="disponible">Disponible</option><option value="vendido">Vendido</option></select>
+      </div>
+      <div class="campo solo-accesorio"><label>&nbsp;</label>
+        <label class="check-item"><input type="checkbox" id="campoPocoStock"> Marcar como poco stock</label>
+      </div>
+
+      <!-- Comunes -->
+      <div class="campo"><label>Precio</label><input id="campoPrecio" type="number" min="0" required></div>
+      <div class="campo"><label>Garantía</label><input id="campoGarantia" placeholder="Ej: 3 meses"></div>
+      <div class="campo full"><label>Observaciones</label><textarea id="campoObservaciones"></textarea></div>
+      <div class="campo full">
+        <label>Etiquetas</label>
+        <div id="campoEtiquetas" class="checks-grid"></div>
+      </div>
+      <div class="campo full"><label class="check-item"><input type="checkbox" id="campoDestacado"> Producto destacado</label></div>
+      <div class="campo full">
+        <label>Fotos (hasta 10, arrastrá para reordenar)</label>
+        <div id="subidaImagenes" class="subida-imagenes"></div>
+      </div>
+      <div class="campo full"><button type="submit" class="btn-primario">Guardar producto</button></div>
+    </form>
+  </div>
+</div>
+
+<script type="module">
+  import { iniciarDashboard } from "./js/pages/dashboard.js";
+  iniciarDashboard();
+</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+rules_version = '2';
+
+// ===================================================================
+// Reglas de seguridad de Storage
+// - Lectura pública de imágenes de productos y configuración (para el catálogo).
+// - Escritura (subida/eliminación) solo para empleados y administradores logueados.
+// ===================================================================
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Como las cuentas de usuario solo las crea un administrador (no hay
+    // alta pública), cualquier usuario autenticado es empleado o administrador.
+    function estaLogueado() {
+      return request.auth != null;
+    }
+
+    match /products/{productoId}/{archivo} {
+      allow read: true;
+      allow write: if estaLogueado();
+    }
+
+    match /config/{archivo} {
+      allow read: true;
+      allow write: if estaLogueado();
+    }
+  }
+}

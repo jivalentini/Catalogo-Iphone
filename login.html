@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ingresar · Catálogo de iPhone</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="login-pagina">
+  <div class="login-caja">
+    <h1>Ingresar</h1>
+    <p>Acceso para empleados y administradores.</p>
+    <form id="formLogin">
+      <div class="campo">
+        <label>Email</label>
+        <input id="loginEmail" type="email" required placeholder="tu@email.com">
+      </div>
+      <div class="campo">
+        <label>Contraseña</label>
+        <input id="loginPassword" type="password" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn-primario" style="width:100%">Ingresar</button>
+      <p id="mensajeError" class="mensaje-error"></p>
+    </form>
+    <p style="margin-top:18px"><a href="index.html">&larr; Volver al catálogo</a></p>
+  </div>
+</div>
+<script type="module">
+  import { iniciarLogin } from "./js/pages/login.js";
+  iniciarLogin();
+</script>
+</body>
+</html>

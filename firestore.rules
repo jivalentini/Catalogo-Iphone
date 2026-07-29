@@ -1,0 +1,90 @@
+rules_version = '2';
+
+// ===================================================================
+// Reglas de seguridad de Firestore
+// - Cliente (sin login): solo lectura de products, categories y config.
+// - Empleado: lectura/escritura de products; NO puede tocar users.
+// - Administrador: acceso total (products, categories, config, users, stats).
+// ===================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function estaLogueado() {
+      return request.auth != null;
+    }
+
+    function perfil() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function esEmpleadoActivo() {
+      return estaLogueado()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && perfil().activo != false
+        && (perfil().rol == 'empleado' || perfil().rol == 'administrador');
+    }
+
+    function esAdministrador() {
+      return estaLogueado()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && perfil().activo != false
+        && perfil().rol == 'administrador';
+    }
+
+    // Productos: lectura pública, alta/edición completa de empleados y
+    // administradores. Se permite además que cualquier visitante (sin
+    // login) incremente únicamente los contadores de visitas o consultas
+    // de WhatsApp, ya que esas señales se registran desde el catálogo público.
+    match /products/{productId} {
+      allow read: true;
+      allow create, delete: if esEmpleadoActivo();
+      allow update: if esEmpleadoActivo() ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['visitas']) ||
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['consultasWhatsapp']);
+    }
+
+    // Categorías: lectura pública, escritura solo administrador
+    match /categories/{categoryId} {
+      allow read: true;
+      allow write: if esAdministrador();
+    }
+
+    // Configuración visual del negocio: lectura pública, escritura solo administrador
+    match /config/negocio {
+      allow read: true;
+      allow write: if esAdministrador();
+    }
+
+    // Contadores de código automático: lectura/escritura de empleados (necesario al crear productos)
+    match /config/contadores {
+      allow read: if esEmpleadoActivo();
+      allow write: if esEmpleadoActivo();
+    }
+
+    // Estadísticas: lectura de empleados/administradores; incrementos públicos controlados
+    // (visitas y consultas de WhatsApp se registran desde el catálogo público)
+    match /stats/global {
+      allow read: if esEmpleadoActivo();
+      allow create: if true;
+      allow update: if true &&
+        request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['visitasCatalogo', 'consultasWhatsapp']);
+    }
+
+    // Usuarios: solo el administrador gestiona la colección.
+    // Los empleados solo pueden leer su propio documento (para validar su rol).
+    //
+    // NOTA DE BOOTSTRAP: `allow create: if estaLogueado()` es necesario una
+    // única vez, para poder crear el PRIMER administrador desde seed.html
+    // (en ese momento todavía no existe ningún admin que apruebe el alta).
+    // Una vez creado ese primer administrador, reemplazá la línea de abajo
+    // por `allow create: if esAdministrador();` y volvé a publicar las
+    // reglas, para que nadie más pueda auto-asignarse un rol. Ver README,
+    // sección 9 "Seguridad de seed.html".
+    match /users/{userId} {
+      allow read: if estaLogueado() && (request.auth.uid == userId || esAdministrador());
+      allow create: if esAdministrador() || estaLogueado();
+      allow update, delete: if esAdministrador();
+    }
+  }
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de iPhone</title>
+<meta name="description" content="Catálogo de iPhone y accesorios">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="encabezado">
+  <div class="contenedor encabezado__barra">
+    <div class="encabezado__marca">
+      <img data-negocio-logo src="https://placehold.co/64x64/1d1d1f/ffffff?text=Logo" alt="Logo">
+      <span data-negocio-nombre>Mi Tienda iPhone</span>
+    </div>
+    <nav class="encabezado__nav">
+      <a href="index.html">Catálogo</a>
+      <a href="login.html">Ingresar</a>
+    </nav>
+  </div>
+</header>
+
+<section class="banner" data-negocio-banner style="background-size:cover;background-position:center;position:relative">
+  <div class="contenedor" style="position:relative;z-index:1">
+    <div class="banner__titulo" data-negocio-nombre>Mi Tienda iPhone</div>
+    <div class="banner__subtitulo">Encontrá tu próximo iPhone y los mejores accesorios</div>
+  </div>
+</section>
+
+<div class="contenedor">
+  <div class="buscador">
+    <div class="buscador__caja">
+      <div class="buscador__input-wrap">
+        <input id="inputBuscador" class="buscador__input" type="text" placeholder="Buscá por modelo, color, capacidad, batería...">
+        <div id="cajaSugerencias" class="buscador__sugerencias"></div>
+      </div>
+      <button id="btnFiltros" class="btn-filtros">Filtros</button>
+    </div>
+
+    <div id="panelFiltros" class="panel-filtros">
+      <div class="filtro-grupo">
+        <label>Precio mínimo</label>
+        <input id="filtroPrecioMin" type="number" placeholder="0">
+      </div>
+      <div class="filtro-grupo">
+        <label>Precio máximo</label>
+        <input id="filtroPrecioMax" type="number" placeholder="Sin límite">
+      </div>
+      <div class="filtro-grupo">
+        <label>Estado</label>
+        <select id="filtroEstado">
+          <option value="">Todos</option>
+          <option value="nuevo">Nuevo</option>
+          <option value="usado">Usado</option>
+        </select>
+      </div>
+      <div class="filtro-grupo">
+        <label>Batería mínima (%)</label>
+        <input id="filtroBateria" type="number" placeholder="Ej: 80">
+      </div>
+      <div class="filtro-grupo">
+        <label>Otros</label>
+        <div class="filtro-check"><input id="filtroFaceId" type="checkbox"><label for="filtroFaceId">Face ID</label></div>
+        <div class="filtro-check"><input id="filtroCaja" type="checkbox"><label for="filtroCaja">Con caja</label></div>
+        <div class="filtro-check"><input id="filtroOriginales" type="checkbox"><label for="filtroOriginales">Partes originales</label></div>
+      </div>
+      <div class="filtro-grupo" style="display:flex;align-items:flex-end;gap:10px">
+        <button id="btnAplicarFiltros" class="btn-primario">Aplicar</button>
+        <button id="btnLimpiarFiltros" class="btn-secundario">Limpiar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="chipsCategoria" class="chips-categoria"></div>
+
+  <div id="gridProductos" class="grid-productos"></div>
+  <div id="estadoVacio" class="estado-vacio oculto">No encontramos productos con esos filtros.</div>
+</div>
+
+<footer class="pie">
+  <div class="contenedor">
+    <p data-negocio-direccion></p>
+    <p data-negocio-horarios></p>
+    <p style="margin-top:8px">
+      <a data-negocio-instagram href="#" target="_blank">Instagram</a> ·
+      <a data-negocio-facebook href="#" target="_blank">Facebook</a>
+    </p>
+  </div>
+</footer>
+
+<script type="module">
+  import { iniciarCatalogo } from "./js/pages/catalog.js";
+  iniciarCatalogo();
+</script>
+</body>
+</html>

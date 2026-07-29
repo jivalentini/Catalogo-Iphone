@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Producto · Catálogo de iPhone</title>
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<header class="encabezado">
+  <div class="contenedor encabezado__barra">
+    <div class="encabezado__marca">
+      <img src="https://placehold.co/64x64/1d1d1f/ffffff?text=Logo" alt="Logo">
+      <span>Catálogo</span>
+    </div>
+    <nav class="encabezado__nav">
+      <a href="index.html">Catálogo</a>
+      <a href="login.html">Ingresar</a>
+    </nav>
+  </div>
+</header>
+
+<div class="contenedor">
+  <div id="detalleProducto" class="detalle"></div>
+</div>
+
+<footer class="pie">
+  <div class="contenedor"><p>&copy; <span id="anio"></span> Catálogo de iPhone</p></div>
+</footer>
+
+<script type="module">
+  import { iniciarDetalleProducto } from "./js/pages/product-detail.js";
+  iniciarDetalleProducto();
+  document.getElementById("anio").textContent = new Date().getFullYear();
+</script>
+</body>
+</html>

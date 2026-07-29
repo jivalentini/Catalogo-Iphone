@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configuración inicial · Catálogo iPhone</title>
+<link rel="stylesheet" href="css/styles.css">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body>
+<div class="login-pagina">
+  <div class="login-caja" style="max-width:520px">
+    <h1>Configuración inicial</h1>
+    <p>Usá esta página <b>una sola vez</b> al desplegar el catálogo. Después
+    de configurar todo, eliminá o restringí el acceso a este archivo
+    (ver README, sección "Seguridad de seed.html").</p>
+
+    <div class="panel" style="padding:16px;margin-bottom:16px">
+      <h2 style="font-size:16px;margin-bottom:10px">1. Crear cuenta de administrador</h2>
+      <div class="campo"><label>Nombre</label><input id="admNombre" type="text" placeholder="Nombre y apellido"></div>
+      <div class="campo"><label>Email</label><input id="admEmail" type="email" placeholder="admin@tunegocio.com"></div>
+      <div class="campo"><label>Contraseña</label><input id="admPass" type="password" placeholder="Mínimo 6 caracteres"></div>
+      <button id="btnCrearAdmin" class="btn-primario">Crear administrador</button>
+      <p id="msgAdmin" style="margin-top:10px;font-size:13px"></p>
+    </div>
+
+    <div class="panel" style="padding:16px">
+      <h2 style="font-size:16px;margin-bottom:10px">2. Cargar datos iniciales</h2>
+      <p style="font-size:13px;margin-bottom:10px">Carga configuración visual por defecto, categorías y 30 productos de ejemplo (20 iPhone + 10 accesorios) con fotos placeholder.</p>
+      <button id="btnSeed" class="btn-secundario">Cargar datos de ejemplo</button>
+      <pre id="logSeed" style="margin-top:10px;font-size:12px;white-space:pre-wrap;color:var(--color-texto-suave)"></pre>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { crearAdministrador, ejecutarSeed, yaHayProductos } from "./js/seed.js";
+
+  document.getElementById("btnCrearAdmin").addEventListener("click", async () => {
+    const nombre = document.getElementById("admNombre").value.trim();
+    const email = document.getElementById("admEmail").value.trim();
+    const password = document.getElementById("admPass").value;
+    const msg = document.getElementById("msgAdmin");
+    if (!nombre || !email || password.length < 6) {
+      msg.textContent = "Completá nombre, email y una contraseña de al menos 6 caracteres.";
+      msg.style.color = "var(--color-error)";
+      return;
+    }
+    msg.textContent = "Creando administrador...";
+    msg.style.color = "var(--color-texto-suave)";
+    try {
+      await crearAdministrador({ nombre, email, password });
+      msg.textContent = "✅ Administrador creado. Ya podés iniciar sesión en login.html";
+      msg.style.color = "var(--color-exito)";
+    } catch (e) {
+      msg.textContent = "Error: " + e.message;
+      msg.style.color = "var(--color-error)";
+    }
+  });
+
+  document.getElementById("btnSeed").addEventListener("click", async () => {
+    const log = document.getElementById("logSeed");
+    log.textContent = "";
+    if (await yaHayProductos()) {
+      if (!confirm("Ya hay productos cargados en Firestore. ¿Seguro que querés cargar los datos de ejemplo de nuevo? Esto puede duplicar productos.")) {
+        return;
+      }
+    }
+    try {
+      await ejecutarSeed((linea) => { log.textContent += linea + "\n"; });
+    } catch (e) {
+      log.textContent += "Error: " + e.message + "\n";
+    }
+  });
+</script>
+</body>
+</html>
